@@ -7,7 +7,7 @@ flask module is needed for this repo</br>
 clone the repo</br>
 `git clone https://github.com/TWTom041/Popcorn-Time_anime_localhost_server.git` </br>
 fill the blanks in `auth_kitsu.json`</br>
-######example:
+example:
 ```json
 {
   "access_token": "1dxCxes5gnPkQV9juv2pxA2MU4gdlskcyROOCXKLwjA",
