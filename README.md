@@ -11,7 +11,7 @@ cd to the directory where main.py is, and run the server like this</br>
 `python main.py [port]`</br>
 example:</br>
 `python main.py 5000`</br>
-the server api will be at 127.0.0.1:5000/
+the server api will be at localhost:5000/
 # Known issue
 1. Still not able to watch
 # Todo
