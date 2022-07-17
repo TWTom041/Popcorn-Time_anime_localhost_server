@@ -1,8 +1,11 @@
 # based on popcorn time 0.4.7
+import sys
+
 from flask import Flask, jsonify, request
 import requests
 from datetime import datetime
 from time import mktime
+from sys import argv
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -158,4 +161,5 @@ def home():
     return "TWTom's custom Popcorn Time server for anime"
 
 
-app.run()
+if __name__ == "__main__":
+    app.run(port=int(sys.argv[1]))
