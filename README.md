@@ -12,3 +12,9 @@ cd to the directory where main.py is, and run the server like this</br>
 example:</br>
 `python main.py 5000`</br>
 the server api will be at 127.0.0.1:5000/
+# Known issue
+1. Still not able to watch
+# Todo
+1. Make thing work
+2. Database support
+3. Other website support. (only kitsu api supported now)
