@@ -1,14 +1,81 @@
 # based on popcorn time 0.4.7
-import sys
-
 from flask import Flask, jsonify, request
 import requests
 from datetime import datetime
-from time import mktime
+from time import mktime, time
 from sys import argv
+import json
+from urllib import parse
+from ast import literal_eval
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
+sort = {"seeds": "-averageRating",
+        "name": "-titles",
+        "year": "-startDate"}
+genres = [
+    'All',
+    'Action',
+    'Adventure',
+    'Cars',  #
+    'Comedy',
+    'Dementia',
+    'Demons',  #
+    'Drama',
+    'Ecchi',
+    'Fantasy',
+    'Game',  #
+    'Harem',
+    'Historical',
+    'Horror',
+    'Josei',
+    'Kids',  # a little
+    'Magic',
+    'Martial Arts',
+    'Mecha',
+    'Military',
+    'Music',
+    'Mystery',
+    'Parody',
+    'Police',  #
+    'Psychological',
+    'Romance',
+    'Samurai',
+    'School',
+    'Sci-Fi',  #
+    'Seinen',
+    'Shoujo',
+    'Shoujo Ai',
+    'Shounen',
+    'Shounen Ai',
+    'Slice of Life',
+    'Space',
+    'Sports',
+    'Super Power',
+    'Supernatural',
+    'Thriller',
+    'Vampire'
+]
+
+
+def acckitsu(url, method="get"):
+    if method == "get":
+        tmp = open("auth_kitsu.json", 'r')
+        f = json.load(tmp)
+        tmp.close()
+        if time() >= f['created_at'] + f["expires_in"]:
+            re = requests.post("https://kitsu.io/api/oauth/token",
+                               headers={"Content-Type": "application/x-www-form-urlencoded"}, data=parse.urlencode({
+                    "grant_type": 'refresh_token',
+                    "refresh_token": f['refresh_token']
+                }))
+            f = open("auth_kitsu.json", "w")
+            json.dump(re.json(), f)
+            f.close()
+        with open("auth_kitsu.json", 'r') as tmp:
+            f = json.load(tmp)
+            r = requests.get(url, headers={"Authorization": f"Bearer {f['access_token']}"})
+        return r.json()
 
 
 # using kitsu.io's kitsu api
@@ -16,9 +83,12 @@ app.config["DEBUG"] = True
 def animesGet(page):
     r = []
     for i in range(3):
-        target = f"https://kitsu.io/api/edge/anime?page[limit]=20&page[offset]={(page - 1) * 50 + i * 20}&sort=-averageRating" if i != 2 else f"https://kitsu.io/api/edge/anime?page[limit]=10&page[offset]={(page - 1) * 50 + 40}&sort=-averageRating"
+        target = f"https://kitsu.io/api/edge/anime?page[limit]=20&page[offset]={(page - 1) * 50 + i * 20 if i != 2 else (page - 1) * 50 + 40}"
         target += f"&filter[text]={request.args['keywords']}" if "keywords" in request.args else ""
-        data = requests.get(target).json()
+        target += f"&sort={sort[request.args['sort'] if 'sort' in request.args else 'seeds']}"
+        target += f"&filter[categories]={request.args['genre']}" if 'genre' in request.args and request.args[
+            'genre'] != "All" else ''
+        data = acckitsu(target)
         for s in data["data"]:
             tmp = {"_id": s["id"],
                    "mal_id": s["id"],
@@ -33,11 +103,7 @@ def animesGet(page):
                        "titles") else "unknown",
                    "year": s["attributes"]["startDate"][:4] if s["attributes"][
                                                                    "startDate"] is not None else "?",
-                   "slug": (s["attributes"]["titles"]["ja_jp"] if s["attributes"]["titles"].__contains__("ja_jp") else
-                            s["attributes"]["titles"]["en_jp"] if s["attributes"]["titles"].__contains__("en_jp") else
-                            s["attributes"]["titles"]["en"] if s["attributes"]["titles"].__contains__("en") else
-                            list(s["attributes"]["titles"].values())[0]) if s["attributes"].__contains__(
-                       "titles") else "unknown",
+                   "slug": s["attributes"]["slug"] if "slug" in s["attributes"] else "?",
                    "type": "anime",
                    "original_language": "jp",
                    "exist_translations": ["jp"],
@@ -45,7 +111,7 @@ def animesGet(page):
                    "images": {
                        "banner": s['attributes']['coverImage']['original'],
                        "fanart": s['attributes']['coverImage']['original'],
-                       "poster": s["attributes"]["posterImage"]["large"]
+                       "poster": s["attributes"]["posterImage"]["original"]
                    } if s['attributes']['coverImage'] is not None else {},
                    "rating": {
                        "hated": 100,
@@ -162,4 +228,4 @@ def home():
 
 
 if __name__ == "__main__":
-    app.run(port=int(sys.argv[1]) if len(sys.argv) > 2 else 5000)
+    app.run(port=int(argv[1]) if len(argv) > 2 else 5000)
