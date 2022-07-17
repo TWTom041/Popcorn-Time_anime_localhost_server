@@ -158,7 +158,7 @@ def export(collection):
 
 @app.route("/")
 def home():
-    return "TWTom's custom Popcorn Time server for anime"
+    return "custom Popcorn Time server for anime"
 
 
 if __name__ == "__main__":
