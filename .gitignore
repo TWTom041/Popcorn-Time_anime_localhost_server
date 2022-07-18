@@ -1,2 +1,4 @@
+/venv/
 *.idea
-*.json
+auth_kitsu.json
+temp.json
