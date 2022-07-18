@@ -13,23 +13,24 @@ app.config["DEBUG"] = True
 sort = {"seeds": "-averageRating",
         "name": "-titles",
         "year": "-startDate"}
-genres = [
+'''
+genres:
     'All',
     'Action',
     'Adventure',
-    'Cars',  #
+    'Cars',  not available
     'Comedy',
     'Dementia',
-    'Demons',  #
+    'Demons',  not available
     'Drama',
     'Ecchi',
     'Fantasy',
-    'Game',  #
+    'Game',  not available
     'Harem',
     'Historical',
     'Horror',
     'Josei',
-    'Kids',  # a little
+    'Kids',  few contents
     'Magic',
     'Martial Arts',
     'Mecha',
@@ -37,12 +38,12 @@ genres = [
     'Music',
     'Mystery',
     'Parody',
-    'Police',  #
+    'Police',  not available
     'Psychological',
     'Romance',
     'Samurai',
     'School',
-    'Sci-Fi',  #
+    'Sci-Fi',  not available
     'Seinen',
     'Shoujo',
     'Shoujo Ai',
@@ -55,7 +56,7 @@ genres = [
     'Supernatural',
     'Thriller',
     'Vampire'
-]
+'''
 
 
 def acckitsu(url, method="get"):
@@ -91,10 +92,10 @@ def animesGet(page):
         data = acckitsu(target)
         for s in data["data"]:
             tmp = {"_id": s["id"],
-                   "mal_id": s["id"],
-                   "imdb_id": s["id"],
-                   "tmdb_id": s["id"],
-                   "tvdb_id": s["id"],
+                   "mal_id": s["id"],  # not yet supported
+                   "imdb_id": s["id"],  # not yet supported
+                   "tmdb_id": s["id"],  # not yet supported
+                   "tvdb_id": s["id"],  # not yet supported
                    "item_data": s["attributes"]["subtype"],
                    "title": (s["attributes"]["titles"]["ja_jp"] if s["attributes"]["titles"].__contains__("ja_jp") else
                              s["attributes"]["titles"]["en_jp"] if s["attributes"]["titles"].__contains__("en_jp") else
@@ -133,10 +134,10 @@ def animeGet(_id):
     s = requests.get(target).json()["data"]
     return jsonify({
         "_id": s["id"],
-        "mal_id": s["id"],
-        "imdb_id": s["id"],
-        "tmdb_id": s["id"],
-        "tvdb_id": s["id"],
+        "mal_id": s["id"],  # not yet supported
+        "imdb_id": s["id"],  # not yet supported
+        "tmdb_id": s["id"],  # not yet supported
+        "tvdb_id": s["id"],  # not yet supported
         "title": (s["attributes"]["titles"]["ja_jp"] if s["attributes"]["titles"].__contains__("ja_jp") else
                   s["attributes"]["titles"]["en_jp"] if s["attributes"]["titles"].__contains__("en_jp") else
                   s["attributes"]["titles"]["en"] if s["attributes"]["titles"].__contains__("en") else
