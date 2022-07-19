@@ -160,6 +160,7 @@ def animeGet(_id):
             mktime(datetime.strptime(s["attributes"]["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ").timetuple())),
         "__v": 0,
         "episodes": [{
+            "data_based": False,
             "title": "Episode 13",
             "torrents": {
                 "0": {
