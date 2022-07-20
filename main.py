@@ -6,6 +6,7 @@ from time import mktime, time
 from sys import argv
 import json
 from urllib import parse
+import torrentscrapper
 from ast import literal_eval
 
 app = Flask(__name__)
@@ -159,34 +160,7 @@ def animeGet(_id):
         "last_updated": int(
             mktime(datetime.strptime(s["attributes"]["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ").timetuple())),
         "__v": 0,
-        "episodes": [{
-            "data_based": False,
-            "title": "Episode 13",
-            "torrents": {
-                "0": {
-                    "url": "magnet:?xt=urn:btih:IEQGMZOUZJQ5FJJZNURKTTND3KUHBAHT&tr=http://open.nyaatorrents.info:6544/announce&tr=udp://open.demonii.com:1337/announce&tr=udp://tracker.openbittorrent.com:80/announce",
-                    "seeds": 0,
-                    "peers": 0,
-                    "provider": "HorribleSubs"
-                },
-                "480p": {
-                    "url": "magnet:?xt=urn:btih:IEQGMZOUZJQ5FJJZNURKTTND3KUHBAHT&tr=http://open.nyaatorrents.info:6544/announce&tr=udp://open.demonii.com:1337/announce&tr=udp://tracker.openbittorrent.com:80/announce",
-                    "seeds": 0,
-                    "peers": 0,
-                    "provider": "HorribleSubs"
-                },
-                "720p": {
-                    "url": "magnet:?xt=urn:btih:MCZBSUZP4YX2O4SBMBBXLFWBIQCEPOZF&tr=http://open.nyaatorrents.info:6544/announce&tr=udp://open.demonii.com:1337/announce&tr=udp://tracker.openbittorrent.com:80/announce",
-                    "seeds": 0,
-                    "peers": 0,
-                    "provider": "HorribleSubs"
-                }
-            },
-            "season": "1",
-            "episode": "13",
-            "overview": "We still don't have single episode overviews for anime… Sorry",
-            "tvdb_id": "5646-1-13"
-        }],
+        "episodes": torrentscrapper.nyaa(s),
         "genres": ["Comedy"],
         "images": {
             "banner": s['attributes']['coverImage']['original'],
