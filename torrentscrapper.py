@@ -32,7 +32,8 @@ def parse(res, provider, source, tvdb_id, totaltitle, presubbed=True):
     result = []
     # res[0] = [title1, title2.....]
     res[0] = list(filter(lambda bar: bar.endswith((".mp4", ".mkv", ".avi", ".mov", ".flv", ".wmv")) and all(
-        item not in bar for item in ["ED", "OP", "Ending", "Opening", "ending", "opening", "menu"]), res[0]))
+        item not in bar for item in ["ED", "OP", "Ending", "Opening", "ending", "opening", "menu", "pv", "cm"]),
+                         res[0]))
     for titl in res[0]:
         quality = "1080p" if any(
             chk in totaltitle.lower() for chk in ["1080", "fhd", "fullhd", "full hd", "full.hd"]) else \
@@ -70,53 +71,94 @@ def acgrip():
 
 # scratch contents from nyaa.si
 def nyaa(info):
-    def beautifuler(title, mode, presubbed=True, wf=False):
+    def connector(title, mode, presubbed=True):
         mode_trans = {"en": "1_2", "nonen": "1_3", "raw": "1_4"}
         data = bs(get("https://nyaa.si",
                       params={"q": title, "f": "0", "s": "seeders", "c": mode_trans[mode], "o": "desc"}).text,
                   "html.parser")
-        data = data.find("table", class_="torrent-list").find("tbody").find_all("tr")
+        print(title)
         result = []
-        undone = []
+        try:
+            data = data.find("table", class_="torrent-list").find("tbody").find_all("tr")
+        except AttributeError:
+            return result
+        # data is torrent list in html
         for i in data:
             res = []
+            # foo finds one torrent's name, magnet, seeds and whatever
             foo = i.find_all("td")
+            # seeds == 0
             if foo[5].find(text=True) == "0":
                 break
             res.append((lambda x: [
                 bs(get("https://nyaa.si" + x[1].find("a")["href"]).text, 'html.parser'),
                 x[2].find_all("a")[1]["href"], int(x[5].find(text=True))])(foo))
+            # totaltitle is the title displayed on html
             totaltitle = res[-1][0].find("h3", class_="panel-title").text
+            # this line will trans file names in html into file names
             res[-1][0] = [d.parent.find(text=True, recursive=False)[:-1] for d in
                           res[-1][0].find_all("i", {"class": "fa-file"})]
             # res[-1] = [[title1, title2...], magnet_link, seeds]
-            for ep in parse(res[-1], "nyaa.si", "https://nyaa.si" + foo[1].find("a")["href"], info["id"], totaltitle,
-                           presubbed):
-                if result == []:
-                    result = parse(res[-1], "nyaa.si", "https://nyaa.si" + foo[1].find("a")["href"], info["id"],
-                                   totaltitle,
-                                   presubbed)
-                else:
-                    pass
-
-            if len(result) >= 3:
-                if not wf:
-                    print("com")
-                    # it's compilation
-                    # check what seasons are missing
-                    containedseason = sorted(list(set([i["season"] for i in result])))
-                    for n in range(containedseason[-1]):
-                        if n not in containedseason:
-                            undone.append(n)
-                    for season in undone:
-                        beautifuler(f"{title} s{season}", mode, wf=True)
+            parsed = parse(res[-1], "nyaa.si", "https://nyaa.si" + foo[1].find("a")["href"], info["id"], totaltitle,
+                           presubbed)
+            for ep in parsed:
+                if not result:
+                    # the result is empty
+                    result = parsed
                     break
                 else:
-                    # the work done in second lap
-                    pass
+                    # check which episode is parsed
+                    tempflag = False  # if the current episode didn't do any thing to existed, then true
+                    for existep in result:
+                        if existep["season"] == ep["season"] and existep["episode"] == ep["episode"]:
+                            # matched
+                            tempflag = True
+                            if list(ep["torrents"].keys())[0] in existep["torrents"].keys():
+                                # do nothing
+                                print("same file")
+                            else:
+                                # resolution not in still
+                                result[result.index(existep)]["torrents"] = result[result.index(existep)]["torrents"] | \
+                                                                            ep["torrents"]
+                                break
+                    if tempflag:
+                        # result not yet have this episode
+                        result.append(ep)
+
+            if len(parsed) >= 3:
+                # it's compilation
+                break
             print("https://nyaa.si" + foo[1].find("a")["href"])
             print(result)
         return result
+
+    def beautifuler(title, mode, presubbed=True):
+        fnresult = connector(title, mode, presubbed)
+        s_e = []
+        # s_e = [[season, {episode, episode...}], [season, {episode, episode}]...]
+        for epi in fnresult:
+            if epi["season"] not in [x[0] for x in s_e]:
+                s_e.append([epi["season"], {epi["episode"]}])
+            else:
+                for sets in s_e:
+                    if sets == epi["season"]:
+                        s_e[s_e.index(sets)][1].add(epi["episode"])
+        # find whole season missing
+        missing_s = sorted(set(range(1, sorted([t[0] for t in s_e])[-1]+1)) - set([t[0] for t in s_e]))
+        for season in missing_s:
+            fnresult += connector(title+f" s{season}", mode, presubbed)
+        # check if the anime is still going
+        target = sorted([t[0] for t in s_e])[-1]
+        while True:
+            target += 1
+            tmpres = connector(title+f" s{target}", mode, presubbed)
+            if not tmpres:
+                break
+            fnresult += tmpres
+
+        print("ssss", fnresult)
+        return fnresult
+        pass
 
     title1 = (info["attributes"]["titles"]["en_jp"] if info["attributes"]["titles"].__contains__("en_jp") else
               info["attributes"]["titles"]["en"] if info["attributes"]["titles"].__contains__("en") else
