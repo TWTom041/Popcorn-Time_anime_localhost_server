@@ -101,6 +101,8 @@ def nyaa(info):
             # res[-1] = [[title1, title2...], magnet_link, seeds]
             parsed = parse(res[-1], "nyaa.si", "https://nyaa.si" + foo[1].find("a")["href"], info["id"], totaltitle,
                            presubbed)
+            print("https://nyaa.si" + foo[1].find("a")["href"])
+            print(parsed)
             for ep in parsed:
                 if not result:
                     # the result is empty
@@ -108,28 +110,31 @@ def nyaa(info):
                     break
                 else:
                     # check which episode is parsed
-                    tempflag = False  # if the current episode didn't do any thing to existed, then true
+                    tempflag = True  # if the current episode didn't do any thing to existed, then true
                     for existep in result:
                         if existep["season"] == ep["season"] and existep["episode"] == ep["episode"]:
-                            # matched
-                            tempflag = True
+                            # same file name
+                            tempflag = False
                             if list(ep["torrents"].keys())[0] in existep["torrents"].keys():
-                                # do nothing
+                                # same resolution and file name
                                 print("same file")
                             else:
-                                # resolution not in still
+                                # same file name but resolution
+                                print("did it")
                                 result[result.index(existep)]["torrents"] = result[result.index(existep)]["torrents"] | \
                                                                             ep["torrents"]
-                                break
+                            break
                     if tempflag:
-                        # result not yet have this episode
+                        # another episode
+                        print("diditwlelel")
                         result.append(ep)
+                    else:
+                        print("somethings wrong")
 
             if len(parsed) >= 3:
                 # it's compilation
                 break
-            print("https://nyaa.si" + foo[1].find("a")["href"])
-            print(result)
+
         return result
 
     def beautifuler(title, mode, presubbed=True):
@@ -165,10 +170,13 @@ def nyaa(info):
               info["attributes"]["titles"]["ja_jp"] if info["attributes"]["titles"].__contains__("ja_jp") else
               list(info["attributes"]["titles"].values())[0]) if info["attributes"].__contains__(
         "titles") else "unknown"
+    # dat = {
+    #     "en": beautifuler(title1, "en"),
+    #     "nonen": beautifuler(title1, "nonen"),
+    #     "raw": beautifuler(title1, "raw")
+    # }
     dat = {
-        "en": beautifuler(title1, "en"),
-        "nonen": beautifuler(title1, "nonen"),
-        "raw": beautifuler(title1, "raw")
+        "episodes": beautifuler(title1, "en")
     }
     return dat
 
