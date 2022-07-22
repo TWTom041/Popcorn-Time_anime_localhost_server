@@ -93,11 +93,12 @@ def animesGet(page):
         data = acckitsu(target)
         for s in data["data"]:
             tmp = {"_id": s["id"],
-                   "mal_id": s["id"],  # not yet supported
-                   "imdb_id": s["id"],  # not yet supported
-                   "tmdb_id": s["id"],  # not yet supported
-                   "tvdb_id": s["id"],  # not yet supported
+                   "mal_id": "1"+s["id"],  # not yet supported
+                   "imdb_id": "2"+s["id"],  # not yet supported
+                   "tmdb_id": "3"+s["id"],  # not yet supported
+                   "tvdb_id": "4"+s["id"],  # not yet supported
                    "item_data": s["attributes"]["subtype"],
+                   "anime": True,
                    "title": (s["attributes"]["titles"]["ja_jp"] if s["attributes"]["titles"].__contains__("ja_jp") else
                              s["attributes"]["titles"]["en_jp"] if s["attributes"]["titles"].__contains__("en_jp") else
                              s["attributes"]["titles"]["en"] if s["attributes"]["titles"].__contains__("en") else
@@ -106,10 +107,13 @@ def animesGet(page):
                    "year": s["attributes"]["startDate"][:4] if s["attributes"][
                                                                    "startDate"] is not None else "?",
                    "slug": s["attributes"]["slug"] if "slug" in s["attributes"] else "?",
-                   "type": "anime",
-                   "original_language": "jp",
-                   "exist_translations": ["jp"],
-                   "genres": ["Comedy"],
+                   # "episodes": [],
+                   # "runtime": "1",
+                   "type": "show",
+                   "original_language": "ja",
+                   "exist_translations": ["ja"],
+                   "num_seasons": 1,
+                   # "genres": ["Comedy"],
                    "images": {
                        "banner": s['attributes']['coverImage']['original'],
                        "fanart": s['attributes']['coverImage']['original'],
@@ -120,9 +124,9 @@ def animesGet(page):
                        "loved": 100,
                        "votes": 0,
                        "watching": 0,
-                       "percentage": int(float(s["attributes"]["averageRating"])) if s["attributes"][
-                                                                                         "averageRating"] is not None else 0
-                   }
+                       "percentage": int(float(s["attributes"]["averageRating"])) if
+                       s["attributes"]["averageRating"] is not None else 0},
+                   "contextLocale": "ja"
                    }
             r.append(tmp)
 
@@ -145,18 +149,19 @@ def animeGet(_id):
                   list(s["attributes"]["titles"].values())[0]) if s["attributes"].__contains__(
             "titles") else "unknown",
         "year": s["attributes"]["startDate"][:4] if s["attributes"]["startDate"] is not None else "?",
-        "original_language": "jp",
-        "exist_translations": ["jp"],
+        "original_language": "ja",
+        "exist_translations": ["ja"],
         "slug": s["attributes"]["slug"] if s["attributes"]["slug"] is not None else "?",
-        "contextLocale": "jp",
+        "contextLocale": "ja",
         "network": "whatever company",
         "synopsis": s["attributes"]["synopsis"],
         "runtime": str(s["attributes"]["episodeLength"]),
         "status": s["attributes"]["status"],
-        "type": "anime",
+        "type": "show",
         "country": 'Japan',
         "item_data": s["attributes"]["subtype"],
         "num_seasons": 1,
+        "anime": True,
         "last_updated": int(
             mktime(datetime.strptime(s["attributes"]["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ").timetuple())),
         "__v": 0,

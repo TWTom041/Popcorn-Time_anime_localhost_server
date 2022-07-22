@@ -53,6 +53,7 @@ def parse(res, provider, source, tvdb_id, totaltitle, presubbed=True):
         sresult = re.search(pattern, titl.lower())
         if sresult is None:
             pattern = re.compile(r"\D(\d\d)\D")
+            print(re.findall(pattern, titl)[0])
             eresult = int(re.findall(pattern, titl)[0])
             result.append(uniout(1, eresult, quality, res[1], res[2], titl))
         else:
@@ -128,8 +129,6 @@ def nyaa(info):
                         # another episode
                         print("diditwlelel")
                         result.append(ep)
-                    else:
-                        print("somethings wrong")
 
             if len(parsed) >= 3:
                 # it's compilation
@@ -149,14 +148,17 @@ def nyaa(info):
                     if sets == epi["season"]:
                         s_e[s_e.index(sets)][1].add(epi["episode"])
         # find whole season missing
-        missing_s = sorted(set(range(1, sorted([t[0] for t in s_e])[-1]+1)) - set([t[0] for t in s_e]))
+        try:
+            missing_s = sorted(set(range(1, sorted([t[0] for t in s_e])[-1] + 1)) - set([t[0] for t in s_e]))
+        except IndexError:
+            return fnresult
         for season in missing_s:
-            fnresult += connector(title+f" s{season}", mode, presubbed)
+            fnresult += connector(title + f" s{season}", mode, presubbed)
         # check if the anime is still going
         target = sorted([t[0] for t in s_e])[-1]
         while True:
             target += 1
-            tmpres = connector(title+f" s{target}", mode, presubbed)
+            tmpres = connector(title + f" s{target}", mode, presubbed)
             if not tmpres:
                 break
             fnresult += tmpres
@@ -175,9 +177,8 @@ def nyaa(info):
     #     "nonen": beautifuler(title1, "nonen"),
     #     "raw": beautifuler(title1, "raw")
     # }
-    dat = {
-        "episodes": beautifuler(title1, "en")
-    }
+    dat = beautifuler(title1, "en")
+    print(dat)
     return dat
 
 
