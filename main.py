@@ -107,9 +107,8 @@ def animesGet(page):
                    "year": s["attributes"]["startDate"][:4] if s["attributes"][
                                                                    "startDate"] is not None else "?",
                    "slug": s["attributes"]["slug"] if "slug" in s["attributes"] else "?",
-                   # "episodes": [],
-                   # "runtime": "1",
-                   "type": "show",
+                   "requested_url": "http://127.0.0.1:5000/",
+                   "type": "show" if s["attributes"]["subtype"] != "movie" else "movie",
                    "original_language": "ja",
                    "exist_translations": ["ja"],
                    "num_seasons": 1,
@@ -129,7 +128,6 @@ def animesGet(page):
                    "contextLocale": "ja"
                    }
             r.append(tmp)
-
     return jsonify(r)
 
 
@@ -137,7 +135,7 @@ def animesGet(page):
 def animeGet(_id):
     target = f"https://kitsu.io/api/edge/anime/{_id}"
     s = requests.get(target).json()["data"]
-    return jsonify({
+    r = {
         "_id": s["id"],
         "mal_id": s["id"],  # not yet supported
         "imdb_id": s["id"],  # not yet supported
@@ -157,11 +155,12 @@ def animeGet(_id):
         "synopsis": s["attributes"]["synopsis"],
         "runtime": str(s["attributes"]["episodeLength"]),
         "status": s["attributes"]["status"],
-        "type": "show",
+        "type": "show" if s["attributes"]["subtype"] != "movie" else "movie",
         "country": 'Japan',
         "item_data": s["attributes"]["subtype"],
         "num_seasons": 1,
         "anime": True,
+        "requested_url": "http://127.0.0.1:5000/",
         "last_updated": int(
             mktime(datetime.strptime(s["attributes"]["updatedAt"], "%Y-%m-%dT%H:%M:%S.%fZ").timetuple())),
         "__v": 0,
@@ -180,7 +179,12 @@ def animeGet(_id):
             "percentage": int(float(s["attributes"]["averageRating"])) if s["attributes"][
                                                                               "averageRating"] is not None else 0
         }
-    })
+    }
+    if r["type"] == "movie":
+        r["torrents"] = r["episodes"][0]["torrents"]
+        print(r)
+
+    return jsonify(r)
 
 
 @app.route("/anime/undefined")
