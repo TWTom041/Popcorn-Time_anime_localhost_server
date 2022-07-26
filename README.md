@@ -3,9 +3,13 @@ This project is about Popcorn-Time. Currently, the official APIs are not able to
 # How to use
 ## Installation
 1. clone the repo</br>
-`git clone https://github.com/TWTom041/Popcorn-Time_anime_localhost_server.git` </br>
+```
+git clone https://github.com/TWTom041/Popcorn-Time_anime_localhost_server.git
+```
 2. install the required modules for this repo</br>
-`pip install requirements.txt`</br>
+```
+pip install requirements.txt
+```
 3. complete `auth_kitsu.json`</br>
 example:
 ```json
@@ -19,7 +23,7 @@ example:
 }
 ```
 4. go to the root of Popcorn Time App, which is usually at `%appdata%/Local/Popcorn-Time`</br>
-5. edit `/src/app/lib/views/browser/item.js` into:</br>
+5. append some lines to `/src/app/lib/views/browser/item.js`:</br>
 ```javascript
 ...
 // around line 221:
@@ -78,9 +82,13 @@ about how to get access_token and refresh_token, check the kitsu api docs:</br>
 <https://hummingbird-me.github.io/api-docs/#section/Authentication/Obtaining-an-Access-Token>
 ## Usage
 cd to the directory where main.py is, and run the server like this</br>
-`python main.py [port]`</br>
+```
+python main.py [port]
+```
 example:</br>
-`python main.py 5000`</br>
+```
+python main.py 5000
+```
 the server api will be at localhost:5000/</br>
 then go to Popcorn Time's settings, change the anime api to http://localhost:5000/ or http://127.0.0.1:5000/ </br>
 and the anime is now watchable
