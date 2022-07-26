@@ -2,3 +2,4 @@
 *.idea
 auth_kitsu.json
 temp.json
+/oriapi/shows.json
