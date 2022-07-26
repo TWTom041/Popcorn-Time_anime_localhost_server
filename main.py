@@ -7,7 +7,6 @@ from sys import argv
 import json
 from urllib import parse
 import torrentscrapper
-from ast import literal_eval
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
