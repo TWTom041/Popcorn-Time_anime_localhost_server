@@ -98,3 +98,5 @@ and the anime is now watchable
 # Todo
 1. Database support
 2. Other website support. (only kitsu api supported now)
+# Declaration
+This project can only be used for educational purpose.
